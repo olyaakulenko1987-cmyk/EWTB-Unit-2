@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0879c9">
+  <title>Unit 2 Homework - My Face &amp; My Body</title>
+  <style>
+    :root {
+      --blue:#0879c9; --blue-dark:#075a9d; --sky:#dff5ff; --green:#78c83c;
+      --green-dark:#4d9826; --yellow:#ffd64f; --orange:#ff9c35; --pink:#ff7baa;
+      --red:#e85656; --ink:#18263a; --muted:#607286; --paper:#fffefd;
+      --shadow:0 14px 36px rgba(28,82,119,.16); --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; min-height:100vh; color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 14%,rgba(255,255,255,.92) 0 5px,transparent 6px),
+        radial-gradient(circle at 88% 28%,rgba(255,255,255,.72) 0 7px,transparent 8px),
+        linear-gradient(150deg,#e9f9ff 0%,#caefff 52%,#eafbe1 100%);
+      background-size:42px 42px,58px 58px,auto;
+      font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif;
+      font-size:18px; line-height:1.45;
+    }
+    button{font:inherit;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    button:focus-visible{outline:4px solid var(--yellow);outline-offset:3px}
+    button:disabled{cursor:default}
+    .app{width:min(1120px,calc(100% - 24px));margin:18px auto 34px}
+    .topbar{
+      position:sticky;top:8px;z-index:20;display:flex;align-items:center;gap:14px;
+      padding:10px 14px;margin-bottom:14px;background:rgba(255,255,255,.92);
+      border:2px solid rgba(8,121,201,.16);border-radius:18px;box-shadow:0 8px 22px rgba(25,89,129,.1);
+      backdrop-filter:blur(10px)
+    }
+    .home-button{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;
+      background:#eaf7ff;color:var(--blue-dark);box-shadow:inset 0 0 0 2px #b8e4fa;font-size:24px}
+    .progress-wrap{flex:1;min-width:0}
+    .progress-label{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;font-size:.82rem;font-weight:900;color:var(--blue-dark)}
+    .progress-track{height:15px;overflow:hidden;border-radius:99px;background:#dceaf1;box-shadow:inset 0 2px 4px rgba(24,71,95,.16)}
+    .progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--green),#afe14d);transition:width .4s ease}
+    .star-counter{min-width:88px;padding:9px 12px;border-radius:14px;color:#6b4b00;background:#fff6bf;
+      box-shadow:inset 0 0 0 2px #ffe577;font-weight:900;text-align:center;white-space:nowrap}
+    .lesson-page{position:relative;min-height:710px;overflow:hidden;background:var(--paper);border-radius:8px 8px 28px 28px;
+      border:2px dashed #42b45e;box-shadow:var(--shadow)}
+    .lesson-page:before{content:"";position:absolute;inset:0;pointer-events:none;background:
+      linear-gradient(90deg,rgba(8,121,201,.025) 1px,transparent 1px),linear-gradient(rgba(8,121,201,.025) 1px,transparent 1px);background-size:24px 24px}
+    .ribbons{position:relative;min-height:70px;padding:12px 18px;z-index:2}
+    .unit-ribbon,.lesson-ribbon{position:absolute;top:12px;display:flex;align-items:center;min-height:48px;color:#fff;background:var(--blue);
+      font-size:clamp(1.16rem,3vw,1.58rem);filter:drop-shadow(0 4px 0 rgba(5,67,112,.16))}
+    .unit-ribbon{left:0;width:min(500px,67%);padding:6px 42px 6px 28px;clip-path:polygon(0 0,calc(100% - 26px) 0,100% 50%,calc(100% - 26px) 100%,0 100%)}
+    .lesson-ribbon{right:0;justify-content:center;width:min(210px,29%);padding:6px 18px 6px 34px;
+      clip-path:polygon(24px 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,24px 100%,0 50%);font-size:clamp(.9rem,2.3vw,1.18rem)}
+    .screen{position:relative;z-index:1;display:none;padding:14px clamp(16px,4vw,46px) 36px;animation:appear .34s ease both}
+    .screen.active{display:block}
+    @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    h1,h2,h3,p{margin-top:0} h1,h2,h3{line-height:1.12}
+    h1{margin-bottom:10px;font-size:clamp(2rem,6vw,4rem);color:var(--blue-dark);letter-spacing:-.04em}
+    h2{margin-bottom:10px;font-size:clamp(1.7rem,4.5vw,2.75rem);color:var(--blue-dark)}
+    .lead{max-width:750px;margin-bottom:20px;color:#40546c;font-size:clamp(1.04rem,2.4vw,1.28rem)}
+    .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:28px;min-height:550px}
+    .hello-chip{display:inline-block;margin-bottom:12px;padding:8px 14px;border-radius:999px;color:#704300;background:#fff1a8;font-weight:900;transform:rotate(-1deg)}
+    .hero-bear{position:relative;display:grid;place-items:center;min-height:440px;border-radius:48% 52% 46% 54%/58% 38% 62% 42%;
+      background:radial-gradient(circle at 50% 42%,#fff 0 23%,#c9f2ff 24% 59%,#9fddf5 60% 100%);box-shadow:inset 0 0 0 9px rgba(255,255,255,.7)}
+    .hero-bear:after{content:"★";position:absolute;right:8%;top:5%;color:var(--yellow);font-size:58px;text-shadow:0 4px 0 #e4a918;transform:rotate(12deg)}
+    .bear-svg{width:min(340px,88%);height:auto;filter:drop-shadow(0 12px 10px rgba(29,74,91,.18))}
+    .topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 24px}
+    .topic{padding:13px 14px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 2px #bae4f7;color:var(--blue-dark);font-weight:900}
+    .primary,.secondary,.small-action{min-height:54px;padding:13px 24px;border-radius:16px;font-weight:900;transition:transform .15s ease,box-shadow .15s ease}
+    .primary{color:#fff;background:linear-gradient(180deg,#8ed54a,#5caf2c);box-shadow:0 6px 0 #3f8720,0 10px 18px rgba(68,139,31,.22)}
+    .secondary,.small-action{color:var(--blue-dark);background:#e4f5ff;box-shadow:0 5px 0 #a6d9f4}
+    .small-action{min-height:47px;padding:10px 17px}
+    .primary:hover,.secondary:hover,.small-action:hover{transform:translateY(-2px)}
+    .primary:active,.secondary:active,.small-action:active{transform:translateY(3px);box-shadow:none}
+    .hero-actions,.builder-actions{display:flex;flex-wrap:wrap;gap:12px}
+    .task-line{display:flex;align-items:flex-start;gap:12px;margin:4px 0 20px;font-size:clamp(1.08rem,2.6vw,1.33rem);font-weight:900}
+    .task-number{flex:0 0 auto;color:var(--blue);font-size:1.4em}.hint{color:var(--muted);font-weight:700}
+    .game-layout{display:grid;grid-template-columns:minmax(300px,.86fr) minmax(320px,1.14fr);align-items:center;gap:28px;min-height:520px}
+    .prompt-card{padding:24px;border-radius:26px;background:#eef9ff;box-shadow:inset 0 0 0 3px #b8e5f8;text-align:center}
+    .prompt-kicker{color:var(--blue-dark);font-weight:900}.prompt-word{margin:8px 0;color:var(--red);font-size:clamp(2.2rem,7vw,4rem);line-height:1;font-weight:900}
+    .feedback{min-height:58px;margin-top:16px;padding:10px 14px;border-radius:14px;color:#4c6171;background:#fff;font-weight:900}
+    .feedback.good{color:#277018;background:#eaffd8}.feedback.try{color:#9b4b00;background:#fff0d5}.round-count{color:var(--muted);font-weight:900}
+    .interactive-picture{position:relative;width:min(100%,520px);aspect-ratio:1/1;margin:0 auto;border-radius:28px;
+      background:radial-gradient(circle,#fff 0 18%,#dff6ff 19% 60%,#c1eafa 61% 100%);box-shadow:inset 0 0 0 7px #fff,0 9px 20px rgba(24,96,136,.17)}
+    .interactive-picture .diagram{position:absolute;inset:0;width:100%;height:100%}
+    .svg-marker{cursor:pointer;outline:none;transform-box:fill-box;transform-origin:center}
+    .call-line{fill:none;stroke:var(--blue);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:7 6;vector-effect:non-scaling-stroke}
+    .target-ring{fill:rgba(255,255,255,.72);stroke:var(--blue);stroke-width:3;vector-effect:non-scaling-stroke}
+    .marker-dot{fill:var(--blue);stroke:#fff;stroke-width:5;vector-effect:non-scaling-stroke;filter:drop-shadow(0 4px 2px rgba(6,72,116,.28));transition:fill .18s ease,transform .18s ease}
+    .marker-number{fill:#fff;font-family:"Trebuchet MS",Arial,sans-serif;font-size:24px;font-weight:900;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+    .svg-marker:hover .marker-dot,.svg-marker:focus-visible .marker-dot{fill:var(--blue-dark);transform:scale(1.1)}
+    .svg-marker:focus-visible .marker-dot{stroke:var(--yellow);stroke-width:8}
+    .svg-marker.good .marker-dot{fill:var(--green)}.svg-marker.bad .marker-dot{fill:var(--orange)}.svg-marker.bad{animation:wiggle .35s ease}
+    @keyframes wiggle{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+    .quiz-shell{max-width:880px;margin:4px auto 0}.quiz-card{padding:clamp(20px,4vw,34px);border-radius:28px;background:linear-gradient(145deg,#f8fcff,#e7f7ff);
+      box-shadow:inset 0 0 0 3px #bfe5f8,0 10px 24px rgba(32,99,137,.13)}
+    .quiz-picture{width:150px;height:150px;display:grid;place-items:center;margin:0 auto 12px;border-radius:50%;background:#fff;font-size:82px;box-shadow:0 8px 18px rgba(32,99,137,.14)}
+    .sentence{margin:14px 0 22px;font-size:clamp(1.48rem,4vw,2.3rem);font-weight:900;text-align:center}.blank{display:inline-block;min-width:145px;color:var(--red);border-bottom:5px solid var(--blue)}
+    .choice-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.choice-row.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .choice-button{min-height:70px;padding:14px 18px;border:3px solid #a7dbf4;border-radius:19px;color:var(--blue-dark);background:#fff;
+      font-size:clamp(1.08rem,3vw,1.48rem);font-weight:900;box-shadow:0 5px 0 #a7dbf4}
+    .choice-button:hover{background:#f4fbff;transform:translateY(-2px)}.choice-button.correct{color:#286e15;border-color:var(--green);background:#eaffdc;box-shadow:0 5px 0 var(--green-dark)}
+    .choice-button.wrong{color:#9e361c;border-color:#ffaf84;background:#fff0e8;box-shadow:0 5px 0 #df805a}
+    .adjective-stage{display:grid;grid-template-columns:.9fr 1.1fr;gap:24px;align-items:center}
+    .adjective-visual{min-height:390px;display:grid;place-items:center;border-radius:30px;background:radial-gradient(circle,#fff 0 18%,#fff5c9 19% 61%,#ffe68a 62% 100%);box-shadow:inset 0 0 0 7px #fff}
+    .adjective-visual svg{width:min(360px,90%);height:auto;filter:drop-shadow(0 10px 8px rgba(95,69,17,.18))}
+    .sentence-builder{min-height:94px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:14px;margin:16px 0;border:3px dashed #8ac9e8;border-radius:20px;background:#fff}
+    .placeholder{color:#788a99;font-weight:900}.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}.word-chip{min-height:50px;padding:10px 16px;border-radius:14px;color:#243a4d;background:#fff3ac;box-shadow:0 4px 0 #d9b941;font-weight:900}
+    .word-chip.used{opacity:.35;box-shadow:none;pointer-events:none}.builder-actions{justify-content:center;margin-top:18px}
+    .mixed-icon{font-size:82px;line-height:1}.screen-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:16px;border-top:2px dashed #a8ccdf}.page-dots{color:#6d8191;font-weight:900}
+    .unit-tab{position:absolute;left:18px;bottom:0;padding:8px 18px;color:#fff;background:var(--green);border:2px solid var(--ink);border-bottom:0;font-size:1.1rem;z-index:4}
+    .result-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;align-items:center;min-height:520px}.trophy{display:grid;place-items:center;min-height:410px;border-radius:50%;
+      background:radial-gradient(circle,#fff 0 20%,#fff4ad 21% 56%,#ffd65c 57% 100%);box-shadow:inset 0 0 0 10px #fff;font-size:clamp(7rem,18vw,12rem);filter:drop-shadow(0 12px 10px rgba(134,99,11,.18))}
+    .result-stars{margin:12px 0;color:#d99a00;font-size:clamp(2.3rem,7vw,4rem);letter-spacing:5px;text-shadow:0 3px 0 #ffe88d}.result-score{color:var(--blue-dark);font-size:1.25rem;font-weight:900}
+    .result-message{margin:15px 0 22px;padding:16px 18px;border-radius:18px;background:#e9fbdb;color:#34681c;font-weight:800}.mini-certificate{margin-top:18px;padding:16px;border:3px dashed var(--green);border-radius:18px;background:#fffef2;text-align:center}
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:80}.confetti i{position:absolute;top:-20px;width:12px;height:20px;animation:fall 2.5s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+    @media(max-width:820px){.hero-grid,.game-layout,.adjective-stage,.result-grid{grid-template-columns:1fr}.hero-bear{min-height:330px;order:-1}.interactive-picture{width:min(100%,430px)}.adjective-visual{min-height:310px}.result-grid{text-align:center}.trophy{min-height:300px;order:-1}.choice-row.four{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){body{font-size:16px}.app{width:min(100% - 10px,1120px);margin-top:5px}.topbar{gap:7px;padding:7px;top:3px}.home-button{width:42px;height:42px;flex-basis:42px}.star-counter{min-width:74px;padding:8px}.progress-label span:first-child{display:none}.lesson-page{min-height:calc(100vh - 82px)}
+      .ribbons{min-height:62px}.unit-ribbon,.lesson-ribbon{top:9px;min-height:43px}.unit-ribbon{width:72%;padding-left:16px}.lesson-ribbon{width:31%;padding-left:25px}.screen{padding:10px 12px 32px}.topic-grid{grid-template-columns:1fr 1fr}.choice-row{grid-template-columns:1fr}.choice-row.four{grid-template-columns:1fr 1fr}.screen-footer{justify-content:center}.page-dots{width:100%;text-align:center}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @media print{.topbar,button{display:none!important}body{background:#fff}.app{width:100%;margin:0}.lesson-page{box-shadow:none;border:0}.screen{display:none!important}#screen-result.active{display:block!important}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar" aria-label="Панель прогресса">
+      <button class="home-button" id="homeButton" type="button" aria-label="На главную">⌂</button>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Домашнее задание</span><span id="progressText">Старт</span></div>
+        <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+      <div class="star-counter" aria-label="Звёзды">⭐ <span id="starCount">0</span></div>
+    </div>
+    <main class="lesson-page">
+      <div class="ribbons" aria-hidden="true"><div class="unit-ribbon" id="unitRibbon">Unit 2. Revision!</div><div class="lesson-ribbon" id="lessonRibbon">Homework</div></div>
+
+      <section class="screen active" id="screen-start" data-step="0" aria-labelledby="start-title">
+        <div class="hero-grid">
+          <div>
+            <span class="hello-chip">Unit 2 • Homework ⭐</span>
+            <h1 id="start-title">Teddy’s Revision Quest</h1>
+            <p class="lead">Повтори слова и грамматику Unit 2. Выполняй задания по порядку и собери все 44 звёздочки!</p>
+            <div class="topic-grid">
+              <div class="topic">🙂 My Face</div><div class="topic">🧸 My Body</div>
+              <div class="topic">✏️ have got / has got</div><div class="topic">📏 long / short<br>big / little</div>
+            </div>
+            <div class="hero-actions"><button class="primary" type="button" data-next="face">Начать домашнее задание</button><button class="secondary" id="continueButton" type="button" hidden>Продолжить</button></div>
+          </div>
+          <div class="hero-bear" aria-label="Медвежонок Teddy">
+            <svg class="bear-svg" viewBox="0 0 360 430" role="img" aria-label="Медвежонок Teddy с карандашом">
+              <g stroke="#4d2e24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="95" cy="82" r="48" fill="#a96d43"/><circle cx="266" cy="82" r="48" fill="#a96d43"/>
+                <circle cx="95" cy="82" r="25" fill="#dca474" stroke-width="5"/><circle cx="266" cy="82" r="25" fill="#dca474" stroke-width="5"/>
+                <ellipse cx="180" cy="150" rx="112" ry="112" fill="#b97849"/><ellipse cx="180" cy="185" rx="67" ry="55" fill="#e7b27c" stroke-width="5"/>
+                <circle cx="137" cy="136" r="12" fill="#29252a" stroke-width="4"/><circle cx="223" cy="136" r="12" fill="#29252a" stroke-width="4"/>
+                <circle cx="133" cy="131" r="4" fill="#fff" stroke="none"/><circle cx="219" cy="131" r="4" fill="#fff" stroke="none"/>
+                <ellipse cx="180" cy="170" rx="20" ry="15" fill="#392821"/><path d="M180 183c-3 24-33 26-40 7M180 183c3 24 33 26 40 7" fill="none"/>
+                <ellipse cx="178" cy="333" rx="102" ry="96" fill="#b97849"/><ellipse cx="178" cy="342" rx="60" ry="68" fill="#e7b27c" stroke-width="5"/>
+                <path d="M96 295C44 276 35 238 55 220c16-14 34 7 45 30l26 44M261 295c31-31 45-76 36-109-6-22 17-30 29-9 18 32 12 94-28 139" fill="#b97849"/>
+                <path d="M112 388l-25 25M244 388l25 25" fill="none"/>
+              </g>
+              <g transform="rotate(-30 289 285)" stroke="#633d25" stroke-width="4"><rect x="276" y="225" width="25" height="137" rx="6" fill="#ffd44f"/><path d="M276 225l12-28 13 28z" fill="#f2c19b"/><path d="M284 207l4-10 5 10z" fill="#333"/></g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-face" data-step="1" aria-labelledby="face-title">
+        <h2 id="face-title">My Face</h2><div class="task-line"><span class="task-number">1</span><span>Прочитай слово и нажми на нужную часть лица. <span class="hint">Read and point.</span></span></div>
+        <div class="game-layout">
+          <div class="prompt-card"><div class="prompt-kicker">Find:</div><div class="prompt-word" id="facePrompt">nose</div><div class="feedback" id="faceFeedback" role="status" aria-live="polite">Где это на лице Teddy?</div><div class="round-count" id="faceRound">1 из 6</div></div>
+          <div class="interactive-picture">
+            <svg class="diagram" viewBox="0 0 560 560" role="img" aria-label="Подробное лицо медвежонка Teddy с шестью неподвижными указателями" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <radialGradient id="faceFur" cx="38%" cy="28%" r="72%"><stop offset="0" stop-color="#d59a65"/><stop offset=".72" stop-color="#b87748"/><stop offset="1" stop-color="#9c5f3b"/></radialGradient>
+                <linearGradient id="faceMuzzle" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f2c796"/><stop offset="1" stop-color="#dfaa73"/></linearGradient>
+              </defs>
+              <g stroke="#513126" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="142" cy="151" r="83" fill="#a9653f" stroke-width="10"/><circle cx="418" cy="151" r="83" fill="#a9653f" stroke-width="10"/>
+                <circle cx="142" cy="151" r="47" fill="#e2ab78" stroke-width="7"/><circle cx="418" cy="151" r="47" fill="#e2ab78" stroke-width="7"/>
+                <path d="M118 142c11-22 38-31 61-17M382 125c23-14 50-5 61 17" fill="none" stroke="#f1c596" stroke-width="7" opacity=".72"/>
+                <ellipse cx="280" cy="293" rx="194" ry="210" fill="url(#faceFur)" stroke-width="11"/>
+                <path d="M137 175c28-67 76-99 143-103 68 4 116 36 143 103-49-37-98-45-143-13-46-32-95-24-143 13z" fill="#71452f" stroke-width="7"/>
+                <path d="M203 126c13-29 31-40 49-29 10-22 29-27 43-8 18-13 38-5 46 20 18-8 32 4 35 29-37-9-67-3-96 20-27-22-54-30-77-32z" fill="#8e5737" stroke-width="5"/>
+                <path d="M177 224c22-16 52-14 71 5M312 229c20-19 51-21 73-5" fill="none" stroke-width="9"/>
+                <ellipse cx="208" cy="261" rx="43" ry="51" fill="#fffdf8" stroke-width="7"/><ellipse cx="352" cy="261" rx="43" ry="51" fill="#fffdf8" stroke-width="7"/>
+                <ellipse cx="216" cy="270" rx="20" ry="27" fill="#4c392c" stroke-width="4"/><ellipse cx="344" cy="270" rx="20" ry="27" fill="#4c392c" stroke-width="4"/>
+                <circle cx="209" cy="260" r="7" fill="#fff" stroke="none"/><circle cx="337" cy="260" r="7" fill="#fff" stroke="none"/>
+                <ellipse cx="280" cy="363" rx="118" ry="94" fill="url(#faceMuzzle)" stroke-width="8"/>
+                <path d="M226 348c18-27 89-27 108 0 4 20-19 42-54 42s-58-22-54-42z" fill="#4a3027" stroke-width="5"/>
+                <ellipse cx="265" cy="349" rx="12" ry="7" fill="#fff" stroke="none" opacity=".32"/>
+                <path d="M280 390v15M280 405c-18 36-61 34-74 5M280 405c18 36 61 34 74 5" fill="none" stroke-width="8"/>
+                <path d="M242 432c21 17 55 17 76 0-9 35-67 35-76 0z" fill="#ef7d7d" stroke-width="5"/>
+                <path d="M154 367c-17 8-27 21-32 39M406 367c17 8 27 21 32 39" fill="none" stroke="#965b43" stroke-width="5"/>
+                <circle cx="144" cy="355" r="22" fill="#f39191" stroke="none" opacity=".44"/><circle cx="416" cy="355" r="22" fill="#f39191" stroke="none" opacity=".44"/>
+                <path d="M151 449l18-12M181 477l11-19M409 449l-18-12M379 477l-11-19" fill="none" stroke="#8b5235" stroke-width="5"/>
+              </g>
+              <g class="svg-marker" data-face="head" role="button" tabindex="0" aria-label="head"><title>head</title><path class="call-line" d="M76 63L145 96L170 133"/><circle class="target-ring" cx="170" cy="133" r="8"/><circle class="marker-dot" cx="52" cy="52" r="25"/><text class="marker-number" x="52" y="52">1</text></g>
+              <g class="svg-marker" data-face="hair" role="button" tabindex="0" aria-label="hair"><title>hair</title><path class="call-line" d="M484 66L400 91L349 126"/><circle class="target-ring" cx="349" cy="126" r="8"/><circle class="marker-dot" cx="508" cy="56" r="25"/><text class="marker-number" x="508" y="56">2</text></g>
+              <g class="svg-marker" data-face="eyes" role="button" tabindex="0" aria-label="eyes"><title>eyes</title><path class="call-line" d="M77 244L147 250L197 263"/><circle class="target-ring" cx="197" cy="263" r="8"/><circle class="marker-dot" cx="51" cy="242" r="25"/><text class="marker-number" x="51" y="242">3</text></g>
+              <g class="svg-marker" data-face="ears" role="button" tabindex="0" aria-label="ears"><title>ears</title><path class="call-line" d="M484 206L446 185L418 155"/><circle class="target-ring" cx="418" cy="155" r="8"/><circle class="marker-dot" cx="510" cy="218" r="25"/><text class="marker-number" x="510" y="218">4</text></g>
+              <g class="svg-marker" data-face="nose" role="button" tabindex="0" aria-label="nose"><title>nose</title><path class="call-line" d="M76 376L169 367L235 354"/><circle class="target-ring" cx="235" cy="354" r="8"/><circle class="marker-dot" cx="51" cy="379" r="25"/><text class="marker-number" x="51" y="379">5</text></g>
+              <g class="svg-marker" data-face="mouth" role="button" tabindex="0" aria-label="mouth"><title>mouth</title><path class="call-line" d="M484 431L401 427L327 417"/><circle class="target-ring" cx="327" cy="417" r="8"/><circle class="marker-dot" cx="509" cy="433" r="25"/><text class="marker-number" x="509" y="433">6</text></g>
+            </svg>
+          </div>
+        </div><div class="screen-footer"><span class="page-dots">● ○ ○ ○ ○ ○</span><button class="primary" id="faceNext" type="button" data-next="body" hidden>Дальше: My Body</button></div>
+      </section>
+
+      <section class="screen" id="screen-body" data-step="2" aria-labelledby="body-title">
+        <h2 id="body-title">My Body</h2><div class="task-line"><span class="task-number">2</span><span>Прочитай слово и нажми на нужную часть тела. <span class="hint">Read and point.</span></span></div>
+        <div class="game-layout">
+          <div class="prompt-card"><div class="prompt-kicker">Find:</div><div class="prompt-word" id="bodyPrompt">arms</div><div class="feedback" id="bodyFeedback" role="status" aria-live="polite">Покажи на картинке.</div><div class="round-count" id="bodyRound">1 из 6</div></div>
+          <div class="interactive-picture">
+            <svg class="diagram" viewBox="0 0 560 560" role="img" aria-label="Подробный медвежонок Teddy с шестью неподвижными указателями частей тела" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <radialGradient id="bodyFur" cx="38%" cy="25%" r="76%"><stop offset="0" stop-color="#d49a66"/><stop offset=".75" stop-color="#b87748"/><stop offset="1" stop-color="#985b39"/></radialGradient>
+                <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8bd3ef"/><stop offset="1" stop-color="#54acd4"/></linearGradient>
+              </defs>
+              <g stroke="#513126" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="230" cy="70" r="45" fill="#a86641" stroke-width="8"/><circle cx="330" cy="70" r="45" fill="#a86641" stroke-width="8"/>
+                <circle cx="230" cy="70" r="23" fill="#e0aa77" stroke-width="5"/><circle cx="330" cy="70" r="23" fill="#e0aa77" stroke-width="5"/>
+                <ellipse cx="280" cy="124" rx="92" ry="91" fill="url(#bodyFur)" stroke-width="9"/>
+                <path d="M217 80c17-35 105-41 128 1-24-10-44-6-65 8-22-14-42-18-63-9z" fill="#75472f" stroke-width="5"/>
+                <ellipse cx="280" cy="153" rx="52" ry="40" fill="#e7b57f" stroke-width="6"/>
+                <ellipse cx="246" cy="117" rx="16" ry="20" fill="#fff" stroke-width="5"/><ellipse cx="314" cy="117" rx="16" ry="20" fill="#fff" stroke-width="5"/>
+                <circle cx="250" cy="121" r="8" fill="#342620" stroke="none"/><circle cx="310" cy="121" r="8" fill="#342620" stroke="none"/>
+                <circle cx="246" cy="116" r="3" fill="#fff" stroke="none"/><circle cx="306" cy="116" r="3" fill="#fff" stroke="none"/>
+                <ellipse cx="280" cy="145" rx="17" ry="13" fill="#3d2922" stroke-width="4"/><path d="M280 157c-3 18-23 21-30 8M280 157c3 18 23 21 30 8" fill="none" stroke-width="5"/>
+                <path d="M202 204c23-22 50-30 78-30s55 8 78 30l24 171c-67 31-137 31-204 0z" fill="url(#shirt)" stroke-width="9"/>
+                <path d="M239 183l41 35 41-35M280 218v167" fill="none" stroke="#f7fbff" stroke-width="7"/>
+                <path d="M202 225c-42 11-69 43-82 95l-13 51c-7 26 31 39 44 14l57-116M358 225c42 11 69 43 82 95l13 51c7 26-31 39-44 14l-57-116" fill="url(#bodyFur)" stroke-width="9"/>
+                <ellipse cx="119" cy="390" rx="35" ry="31" fill="#e6b27e" stroke-width="8"/><ellipse cx="441" cy="390" rx="35" ry="31" fill="#e6b27e" stroke-width="8"/>
+                <path d="M98 378l-14-9M95 391l-16 1M102 404l-12 11M462 378l14-9M465 391l16 1M458 404l12 11" fill="none" stroke-width="5"/>
+                <path d="M218 380l-31 95M342 380l31 95" fill="none" stroke="url(#bodyFur)" stroke-width="53"/>
+                <path d="M201 403l-23 72M359 403l23 72" fill="none" stroke="#513126" stroke-width="62"/>
+                <path d="M201 403l-23 72M359 403l23 72" fill="none" stroke="#b87748" stroke-width="47"/>
+                <ellipse cx="166" cy="503" rx="53" ry="27" fill="#e6b27e" stroke-width="9"/><ellipse cx="394" cy="503" rx="53" ry="27" fill="#e6b27e" stroke-width="9"/>
+                <path d="M139 499c12-9 23-12 33-9M367 490c10-3 21 0 33 9" fill="none" stroke="#c78c5c" stroke-width="5"/>
+                <circle cx="245" cy="286" r="7" fill="#fff" stroke="#3f8db4" stroke-width="4"/><circle cx="315" cy="286" r="7" fill="#fff" stroke="#3f8db4" stroke-width="4"/>
+              </g>
+              <g class="svg-marker" data-body="body" role="button" tabindex="0" aria-label="body"><title>body</title><path class="call-line" d="M75 278L158 288L205 309"/><circle class="target-ring" cx="205" cy="309" r="8"/><circle class="marker-dot" cx="49" cy="275" r="25"/><text class="marker-number" x="49" y="275">1</text></g>
+              <g class="svg-marker" data-body="arms" role="button" tabindex="0" aria-label="arms"><title>arms</title><path class="call-line" d="M74 163L132 202L167 252"/><circle class="target-ring" cx="167" cy="252" r="8"/><circle class="marker-dot" cx="49" cy="147" r="25"/><text class="marker-number" x="49" y="147">2</text></g>
+              <g class="svg-marker" data-body="hands" role="button" tabindex="0" aria-label="hands"><title>hands</title><path class="call-line" d="M485 267L458 322L443 370"/><circle class="target-ring" cx="443" cy="370" r="8"/><circle class="marker-dot" cx="511" cy="252" r="25"/><text class="marker-number" x="511" y="252">3</text></g>
+              <g class="svg-marker" data-body="fingers" role="button" tabindex="0" aria-label="fingers"><title>fingers</title><path class="call-line" d="M485 354L465 378L460 393"/><circle class="target-ring" cx="460" cy="393" r="8"/><circle class="marker-dot" cx="511" cy="340" r="25"/><text class="marker-number" x="511" y="340">4</text></g>
+              <g class="svg-marker" data-body="legs" role="button" tabindex="0" aria-label="legs"><title>legs</title><path class="call-line" d="M74 453L139 445L195 430"/><circle class="target-ring" cx="195" cy="430" r="8"/><circle class="marker-dot" cx="49" cy="457" r="25"/><text class="marker-number" x="49" y="457">5</text></g>
+              <g class="svg-marker" data-body="feet" role="button" tabindex="0" aria-label="feet"><title>feet</title><path class="call-line" d="M484 510L449 508L421 503"/><circle class="target-ring" cx="421" cy="503" r="8"/><circle class="marker-dot" cx="510" cy="513" r="25"/><text class="marker-number" x="510" y="513">6</text></g>
+            </svg>
+          </div>
+        </div><div class="screen-footer"><span class="page-dots">● ● ○ ○ ○ ○</span><button class="primary" id="bodyNext" type="button" data-next="grammar" hidden>Дальше: have / has</button></div>
+      </section>
+
+      <section class="screen" id="screen-grammar" data-step="3" aria-labelledby="grammar-title">
+        <h2 id="grammar-title">Have got or has got?</h2><div class="task-line"><span class="task-number">3</span><span>Выбери правильную конструкцию.</span></div>
+        <div class="quiz-shell"><div class="quiz-card"><div class="quiz-picture" id="grammarPicture" aria-hidden="true">👧</div><div class="round-count" id="grammarRound">1 из 8</div>
+          <div class="sentence"><span id="grammarSubject">She</span> <span class="blank" id="grammarBlank">...</span> <span id="grammarTail">two eyes.</span></div>
+          <div class="choice-row" id="grammarChoices"><button class="choice-button" type="button" data-grammar="have got">have got</button><button class="choice-button" type="button" data-grammar="has got">has got</button></div>
+          <div class="feedback" id="grammarFeedback" role="status" aria-live="polite">I → have got. He / She / It → has got.</div>
+        </div></div><div class="screen-footer"><span class="page-dots">● ● ● ○ ○ ○</span><button class="primary" id="grammarNext" type="button" data-next="adjectives" hidden>Дальше: признаки</button></div>
+      </section>
+
+      <section class="screen" id="screen-adjectives" data-step="4" aria-labelledby="adjectives-title">
+        <h2 id="adjectives-title">Long, short, big or little?</h2><div class="task-line"><span class="task-number">4</span><span>Посмотри на картинку и выбери подходящее слово.</span></div>
+        <div class="adjective-stage">
+          <div class="adjective-visual" id="adjectiveVisual" aria-label="Картинка к заданию"></div>
+          <div class="quiz-card"><div class="round-count" id="adjectiveRound">1 из 8</div><div class="sentence" id="adjectiveSentence">It has got ___ legs.</div>
+            <div class="choice-row four" id="adjectiveChoices"></div><div class="feedback" id="adjectiveFeedback" role="status" aria-live="polite">long — длинный, short — короткий, big — большой, little — маленький.</div>
+          </div>
+        </div><div class="screen-footer"><span class="page-dots">● ● ● ● ○ ○</span><button class="primary" id="adjectiveNext" type="button" data-next="builder" hidden>Собрать предложения</button></div>
+      </section>
+
+      <section class="screen" id="screen-builder" data-step="5" aria-labelledby="builder-title">
+        <h2 id="builder-title">Build a sentence</h2><div class="task-line"><span class="task-number">5</span><span>Нажимай на слова по порядку и собери предложение.</span></div>
+        <div class="quiz-shell"><div class="quiz-card"><div class="round-count" id="builderRound">1 из 6</div><div class="sentence-builder" id="sentenceBuilder" aria-live="polite"><span class="placeholder">Собери предложение здесь</span></div>
+          <div class="chips" id="wordChips"></div><div class="builder-actions"><button class="small-action" id="undoWord" type="button">↶ Убрать слово</button><button class="primary" id="checkSentence" type="button">Проверить</button></div>
+          <div class="feedback" id="builderFeedback" role="status" aria-live="polite">Сначала кто? Потом have got или has got.</div>
+        </div></div><div class="screen-footer"><span class="page-dots">● ● ● ● ● ○</span><button class="primary" id="builderNext" type="button" data-next="mixed" hidden>Финальный тест</button></div>
+      </section>
+
+      <section class="screen" id="screen-mixed" data-step="6" aria-labelledby="mixed-title">
+        <h2 id="mixed-title">Final revision</h2><div class="task-line"><span class="task-number">6</span><span>Последние 10 вопросов по всему домашнему заданию.</span></div>
+        <div class="quiz-shell"><div class="quiz-card"><div class="quiz-picture mixed-icon" id="mixedIcon" aria-hidden="true">👀</div><div class="round-count" id="mixedRound">1 из 10</div>
+          <div class="sentence" id="mixedQuestion">Choose the word.</div><div class="choice-row" id="mixedChoices"></div><div class="feedback" id="mixedFeedback" role="status" aria-live="polite">Выбери один ответ.</div>
+        </div></div><div class="screen-footer"><span class="page-dots">● ● ● ● ● ●</span><button class="primary" id="mixedNext" type="button" data-next="result" hidden>Показать результат</button></div>
+      </section>
+
+      <section class="screen" id="screen-result" data-step="7" aria-labelledby="result-title">
+        <div class="result-grid"><div class="trophy" aria-hidden="true">🏆</div><div><h2 id="result-title">Homework complete!</h2><div class="result-stars" aria-label="Три звезды">★★★</div>
+          <div class="result-score">Собрано <span id="finalScore">0</span> из 44 звёздочек.</div><div class="result-message" id="resultMessage">Unit 2 повторён!</div>
+          <div class="mini-certificate"><b>🌟 Unit 2 Revision 🌟</b><br>Домашнее задание выполнено<br><small>Face • Body • have got / has got • adjectives</small></div>
+          <div class="hero-actions" style="margin-top:18px"><button class="primary" id="playAgain" type="button">Выполнить ещё раз</button><button class="secondary" id="printResult" type="button">Распечатать результат</button></div>
+        </div></div>
+      </section>
+      <div class="unit-tab">Unit 2</div>
+    </main>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script>
+    (()=>{
+      'use strict';
+      const MAX_STARS=44;
+      const stepNames=['Старт','My Face','My Body','Have / Has','Признаки','Предложения','Тест','Готово!'];
+      const ribbons={start:['Unit 2. Revision!','Homework'],face:['Unit 2. My Face!','Task 1'],body:['Unit 2. My Body!','Task 2'],grammar:['Unit 2. Have got!','Task 3'],adjectives:['Unit 2. Adjectives!','Task 4'],builder:['Unit 2. Sentences!','Task 5'],mixed:['Unit 2. Revision!','Final'],result:['Unit 2. Well done!','Complete']};
+      const state={screen:'start',stars:0,faceIndex:0,bodyIndex:0,grammarIndex:0,adjectiveIndex:0,builderIndex:0,mixedIndex:0,builtWords:[],completed:{face:false,body:false,grammar:false,adjectives:false,builder:false,mixed:false}};
+      let savedProgress=null;
+      const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+      const faceItems=['nose','eyes','mouth','ears','hair','head'];
+      const bodyItems=['arms','legs','hands','feet','fingers','body'];
+      const grammarItems=[
+        {icon:'👧',subject:'She',tail:'two eyes.',answer:'has got'},{icon:'🙂',subject:'I',tail:'a nose.',answer:'have got'},
+        {icon:'👦',subject:'He',tail:'two ears.',answer:'has got'},{icon:'🐻',subject:'It',tail:'a big body.',answer:'has got'},
+        {icon:'🙋',subject:'I',tail:'ten fingers.',answer:'have got'},{icon:'👧',subject:'She',tail:'long hair.',answer:'has got'},
+        {icon:'👦',subject:'He',tail:'two hands.',answer:'has got'},{icon:'🐶',subject:'It',tail:'four legs.',answer:'has got'}
+      ];
+      const longLegs=`<svg viewBox="0 0 360 300" role="img" aria-label="Животное с длинными ногами"><g stroke="#55392d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="180" cy="108" rx="95" ry="58" fill="#f2a34a"/><circle cx="270" cy="87" r="45" fill="#f2a34a"/><path d="M290 49l18-35 13 45M250 50l-5-38 30 32" fill="#f2a34a"/><circle cx="283" cy="80" r="6" fill="#222"/><path d="M300 102c16 7 28 2 35-7" fill="none"/><path d="M119 151v118M160 157v112M211 157v112M249 150v119" fill="none" stroke-width="18"/><path d="M102 270h32M143 270h32M194 270h32M232 270h34"/></g></svg>`;
+      const shortLegs=`<svg viewBox="0 0 360 300" role="img" aria-label="Животное с короткими ногами"><g stroke="#55392d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="180" cy="145" rx="120" ry="72" fill="#e3a56f"/><circle cx="289" cy="126" r="50" fill="#e3a56f"/><path d="M305 82l15-31 18 42M272 85l-8-33 29 25" fill="#e3a56f"/><circle cx="305" cy="119" r="6" fill="#222"/><path d="M86 201v43M143 211v33M217 211v33M272 202v42" fill="none" stroke-width="20"/><path d="M70 246h34M128 246h34M201 246h34M257 246h34"/></g></svg>`;
+      const bigBody=`<svg viewBox="0 0 360 300" role="img" aria-label="Животное с большим телом"><g stroke="#57372d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="178" cy="158" rx="135" ry="105" fill="#8dd083"/><circle cx="291" cy="100" r="46" fill="#8dd083"/><circle cx="305" cy="93" r="6" fill="#222"/><path d="M58 120C22 95 20 61 42 50" fill="none"/><path d="M102 239v34M245 238v35" stroke-width="18"/><path d="M85 275h34M229 275h34"/></g></svg>`;
+      const littleBody=`<svg viewBox="0 0 360 300" role="img" aria-label="Животное с маленьким телом"><g stroke="#57372d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="180" cy="158" rx="62" ry="50" fill="#82c9e8"/><circle cx="240" cy="126" r="31" fill="#82c9e8"/><circle cx="249" cy="121" r="5" fill="#222"/><path d="M125 145c-35-21-45-51-23-69" fill="none"/><path d="M150 198v43M210 197v44" stroke-width="14"/><path d="M136 242h27M197 242h27"/></g></svg>`;
+      const adjectiveItems=[
+        {visual:longLegs,text:'It has got ___ legs.',answer:'long'},{visual:shortLegs,text:'It has got ___ legs.',answer:'short'},
+        {visual:bigBody,text:'It has got a ___ body.',answer:'big'},{visual:littleBody,text:'It has got a ___ body.',answer:'little'},
+        {visual:shortLegs,text:'Its legs are ___.',answer:'short'},{visual:bigBody,text:'Its body is ___.',answer:'big'},
+        {visual:longLegs,text:'Its legs are ___.',answer:'long'},{visual:littleBody,text:'Its body is ___.',answer:'little'}
+      ];
+      const builderItems=[['I','have got','two eyes.'],['She','has got','long hair.'],['He','has got','two ears.'],['It','has got','short legs.'],['It','has got','a big body.'],['I','have got','ten fingers.']];
+      const mixedItems=[
+        {icon:'👀',q:'Choose the word.',choices:['eyes','ears'],a:'eyes'},{icon:'👂',q:'Choose the word.',choices:['mouth','ears'],a:'ears'},
+        {icon:'👣',q:'Choose the word.',choices:['feet','hands'],a:'feet'},{icon:'🖐️',q:'Choose the word.',choices:['fingers','legs'],a:'fingers'},
+        {icon:'👧',q:'She ___ two eyes.',choices:['have got','has got'],a:'has got'},{icon:'🙋',q:'I ___ a mouth.',choices:['have got','has got'],a:'have got'},
+        {icon:'🐻',q:'It ___ a big body.',choices:['have got','has got'],a:'has got'},{icon:'📏',q:'Opposite of long:',choices:['short','little'],a:'short'},
+        {icon:'🐘',q:'A very large body is a ___ body.',choices:['big','little'],a:'big'},{icon:'🐭',q:'A very small body is a ___ body.',choices:['long','little'],a:'little'}
+      ];
+
+      function save(){try{localStorage.setItem('teddyBearUnit2Homework',JSON.stringify({screen:state.screen,stars:state.stars,faceIndex:state.faceIndex,bodyIndex:state.bodyIndex,grammarIndex:state.grammarIndex,adjectiveIndex:state.adjectiveIndex,builderIndex:state.builderIndex,mixedIndex:state.mixedIndex,completed:state.completed}))}catch(_){}}
+      function loadSaved(){try{const s=JSON.parse(localStorage.getItem('teddyBearUnit2Homework')||'null');if(s&&s.screen&&s.screen!=='start'){savedProgress=s;$('#continueButton').hidden=false}}catch(_){}}
+      function restoreButtons(){$('#faceNext').hidden=!state.completed.face;$('#bodyNext').hidden=!state.completed.body;$('#grammarNext').hidden=!state.completed.grammar;$('#adjectiveNext').hidden=!state.completed.adjectives;$('#builderNext').hidden=!state.completed.builder;$('#mixedNext').hidden=!state.completed.mixed}
+      function setFeedback(el,text,kind=''){el.textContent=text;el.className='feedback'+(kind?' '+kind:'')}
+      function addStar(){state.stars=Math.min(MAX_STARS,state.stars+1);$('#starCount').textContent=state.stars;save()}
+      function updateTop(step){$('#progressBar').style.width=Math.round(step/7*100)+'%';$('#progressText').textContent=stepNames[step];$('#starCount').textContent=state.stars}
+      function showScreen(name){const target=$('#screen-'+name);if(!target)return;$$('.screen').forEach(s=>s.classList.toggle('active',s===target));state.screen=name;const step=Number(target.dataset.step||0);updateTop(step);const t=ribbons[name]||ribbons.start;$('#unitRibbon').textContent=t[0];$('#lessonRibbon').textContent=t[1];restoreButtons();window.scrollTo({top:0,behavior:'smooth'});save();if(name==='face')renderFace();if(name==='body')renderBody();if(name==='grammar')renderGrammar();if(name==='adjectives')renderAdjective();if(name==='builder')renderBuilder();if(name==='mixed')renderMixed();if(name==='result')renderResult()}
+      $$('[data-next]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.next)));$('#homeButton').addEventListener('click',()=>showScreen('start'));
+
+      function renderFace(){const x=faceItems[Math.min(state.faceIndex,5)];$('#facePrompt').textContent=x;$('#faceRound').textContent=Math.min(state.faceIndex+1,6)+' из 6';if(!state.completed.face)setFeedback($('#faceFeedback'),'Где это на лице Teddy?')}
+      $$('[data-face]').forEach(b=>b.addEventListener('click',()=>{if(state.completed.face)return;const x=faceItems[state.faceIndex];if(b.dataset.face===x){b.classList.add('good');addStar();setFeedback($('#faceFeedback'),'Верно! Great job! ⭐','good');state.faceIndex++;setTimeout(()=>{b.classList.remove('good');if(state.faceIndex>=6){state.completed.face=true;$('#faceNext').hidden=false;setFeedback($('#faceFeedback'),'Все 6 слов найдены!','good');save()}else{renderFace();setFeedback($('#faceFeedback'),'Найди следующее слово.')}},620)}else{b.classList.add('bad');setFeedback($('#faceFeedback'),'Попробуй ещё раз.','try');setTimeout(()=>b.classList.remove('bad'),420)}}));
+      function renderBody(){const x=bodyItems[Math.min(state.bodyIndex,5)];$('#bodyPrompt').textContent=x;$('#bodyRound').textContent=Math.min(state.bodyIndex+1,6)+' из 6';if(!state.completed.body)setFeedback($('#bodyFeedback'),'Покажи на картинке.')}
+      $$('[data-body]').forEach(b=>b.addEventListener('click',()=>{if(state.completed.body)return;const x=bodyItems[state.bodyIndex];if(b.dataset.body===x){b.classList.add('good');addStar();setFeedback($('#bodyFeedback'),'Верно! Yes! ⭐','good');state.bodyIndex++;setTimeout(()=>{b.classList.remove('good');if(state.bodyIndex>=6){state.completed.body=true;$('#bodyNext').hidden=false;setFeedback($('#bodyFeedback'),'Все части тела найдены!','good');save()}else{renderBody();setFeedback($('#bodyFeedback'),'Найди следующее слово.')}},620)}else{b.classList.add('bad');setFeedback($('#bodyFeedback'),'Посмотри внимательнее.','try');setTimeout(()=>b.classList.remove('bad'),420)}}));
+      $$('[data-face],[data-body]').forEach(marker=>marker.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();marker.dispatchEvent(new MouseEvent('click',{bubbles:true}))}}));
+
+      function renderGrammar(){const x=grammarItems[Math.min(state.grammarIndex,7)];$('#grammarPicture').textContent=x.icon;$('#grammarSubject').textContent=x.subject;$('#grammarTail').textContent=x.tail;$('#grammarBlank').textContent='...';$('#grammarRound').textContent=Math.min(state.grammarIndex+1,8)+' из 8';$$('#grammarChoices button').forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong')});if(!state.completed.grammar)setFeedback($('#grammarFeedback'),'I → have got. He / She / It → has got.')}
+      $$('#grammarChoices [data-grammar]').forEach(b=>b.addEventListener('click',()=>{if(state.completed.grammar)return;const x=grammarItems[state.grammarIndex];$$('#grammarChoices button').forEach(c=>c.disabled=true);if(b.dataset.grammar===x.answer){b.classList.add('correct');addStar();setFeedback($('#grammarFeedback'),'Правильно! ⭐','good')}else{b.classList.add('wrong');$(`#grammarChoices [data-grammar="${x.answer}"]`).classList.add('correct');setFeedback($('#grammarFeedback'),x.subject+' '+x.answer+'.','try')}$('#grammarBlank').textContent=x.answer;state.grammarIndex++;setTimeout(()=>{if(state.grammarIndex>=8){state.completed.grammar=true;$('#grammarNext').hidden=false;setFeedback($('#grammarFeedback'),'Готово! Have got и has got повторены.','good');save()}else renderGrammar()},950)}));
+
+      function renderAdjective(){const x=adjectiveItems[Math.min(state.adjectiveIndex,7)];$('#adjectiveVisual').innerHTML=x.visual;$('#adjectiveSentence').textContent=x.text;$('#adjectiveRound').textContent=Math.min(state.adjectiveIndex+1,8)+' из 8';const box=$('#adjectiveChoices');box.innerHTML='';['long','short','big','little'].forEach(w=>{const b=document.createElement('button');b.type='button';b.className='choice-button';b.textContent=w;b.dataset.answer=w;b.addEventListener('click',()=>answerAdjective(b));box.appendChild(b)});if(!state.completed.adjectives)setFeedback($('#adjectiveFeedback'),'Выбери слово по картинке.')}
+      function answerAdjective(b){if(state.completed.adjectives)return;const x=adjectiveItems[state.adjectiveIndex];$$('#adjectiveChoices button').forEach(c=>c.disabled=true);if(b.dataset.answer===x.answer){b.classList.add('correct');addStar();setFeedback($('#adjectiveFeedback'),'Верно! '+x.answer+' ⭐','good')}else{b.classList.add('wrong');$(`#adjectiveChoices [data-answer="${x.answer}"]`).classList.add('correct');setFeedback($('#adjectiveFeedback'),'Правильный ответ: '+x.answer+'.','try')}state.adjectiveIndex++;setTimeout(()=>{if(state.adjectiveIndex>=8){state.completed.adjectives=true;$('#adjectiveNext').hidden=false;setFeedback($('#adjectiveFeedback'),'Все признаки повторены!','good');save()}else renderAdjective()},900)}
+
+      function shuffle(a){const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+      function renderBuilt(){const box=$('#sentenceBuilder');box.innerHTML='';if(!state.builtWords.length){const s=document.createElement('span');s.className='placeholder';s.textContent='Собери предложение здесь';box.appendChild(s);return}state.builtWords.forEach(w=>{const s=document.createElement('span');s.className='word-chip';s.textContent=w;box.appendChild(s)})}
+      function renderBuilder(){const words=builderItems[Math.min(state.builderIndex,5)];$('#builderRound').textContent=Math.min(state.builderIndex+1,6)+' из 6';state.builtWords=[];renderBuilt();const box=$('#wordChips');box.innerHTML='';shuffle(words).forEach(w=>{const b=document.createElement('button');b.type='button';b.className='word-chip';b.textContent=w;b.dataset.word=w;b.addEventListener('click',()=>{state.builtWords.push(w);b.classList.add('used');renderBuilt()});box.appendChild(b)});$('#checkSentence').disabled=false;if(!state.completed.builder)setFeedback($('#builderFeedback'),'Сначала кто? Потом have got или has got.')}
+      $('#undoWord').addEventListener('click',()=>{const w=state.builtWords.pop();if(w!==undefined){const b=$$('#wordChips .used').reverse().find(x=>x.dataset.word===w);if(b)b.classList.remove('used');renderBuilt()}});
+      $('#checkSentence').addEventListener('click',()=>{if(state.completed.builder)return;const x=builderItems[state.builderIndex];if(state.builtWords.join('|')===x.join('|')){addStar();setFeedback($('#builderFeedback'),'Предложение собрано! ⭐','good');$('#checkSentence').disabled=true;state.builderIndex++;setTimeout(()=>{if(state.builderIndex>=6){state.completed.builder=true;$('#builderNext').hidden=false;setFeedback($('#builderFeedback'),'Все 6 предложений готовы!','good');save()}else renderBuilder()},900)}else setFeedback($('#builderFeedback'),'Порядок пока не тот. Попробуй ещё.','try')});
+
+      function renderMixed(){const x=mixedItems[Math.min(state.mixedIndex,9)];$('#mixedIcon').textContent=x.icon;$('#mixedQuestion').textContent=x.q;$('#mixedRound').textContent=Math.min(state.mixedIndex+1,10)+' из 10';const box=$('#mixedChoices');box.innerHTML='';x.choices.forEach(w=>{const b=document.createElement('button');b.type='button';b.className='choice-button';b.textContent=w;b.dataset.answer=w;b.addEventListener('click',()=>answerMixed(b));box.appendChild(b)});if(!state.completed.mixed)setFeedback($('#mixedFeedback'),'Выбери один ответ.')}
+      function answerMixed(b){if(state.completed.mixed)return;const x=mixedItems[state.mixedIndex];$$('#mixedChoices button').forEach(c=>c.disabled=true);if(b.dataset.answer===x.a){b.classList.add('correct');addStar();setFeedback($('#mixedFeedback'),'Верно! ⭐','good')}else{b.classList.add('wrong');$(`#mixedChoices [data-answer="${x.a}"]`).classList.add('correct');setFeedback($('#mixedFeedback'),'Правильный ответ: '+x.a+'.','try')}state.mixedIndex++;setTimeout(()=>{if(state.mixedIndex>=10){state.completed.mixed=true;$('#mixedNext').hidden=false;setFeedback($('#mixedFeedback'),'Финальный тест закончен!','good');save()}else renderMixed()},900)}
+
+      function celebrate(){const box=$('#confetti');box.innerHTML='';const colors=['#ffcf45','#ff6fa1','#55b8ed','#77c941','#ad74d2'];for(let i=0;i<48;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'vw';p.style.background=colors[i%colors.length];p.style.animationDelay=Math.random()*.8+'s';box.appendChild(p)}setTimeout(()=>box.innerHTML='',3500)}
+      function renderResult(){$('#finalScore').textContent=state.stars;const r=state.stars/MAX_STARS;$('#resultMessage').textContent=r>=.85?'Отлично! Все темы Unit 2 повторены уверенно.':r>=.6?'Хорошая работа! Можно пройти задания ещё раз и собрать больше звёзд.':'Продолжай тренироваться: повтори картинки и правила, затем попробуй ещё раз.';celebrate()}
+      function reset(){state.screen='start';state.stars=0;state.faceIndex=state.bodyIndex=state.grammarIndex=state.adjectiveIndex=state.builderIndex=state.mixedIndex=0;state.builtWords=[];state.completed={face:false,body:false,grammar:false,adjectives:false,builder:false,mixed:false};savedProgress=null;$('#continueButton').hidden=true;try{localStorage.removeItem('teddyBearUnit2Homework')}catch(_){}showScreen('start')}
+      $('#playAgain').addEventListener('click',reset);$('#printResult').addEventListener('click',()=>window.print());
+      $('#continueButton').addEventListener('click',()=>{if(!savedProgress)return;const screen=savedProgress.screen||'face';state.stars=Number(savedProgress.stars||0);['faceIndex','bodyIndex','grammarIndex','adjectiveIndex','builderIndex','mixedIndex'].forEach(k=>state[k]=Number(savedProgress[k]||0));state.completed=Object.assign(state.completed,savedProgress.completed||{});showScreen(screen)});
+      loadSaved();updateTop(0);
+    })();
+  </script>
+</body>
+</html>
